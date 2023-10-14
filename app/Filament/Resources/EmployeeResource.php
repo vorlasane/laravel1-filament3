@@ -2,16 +2,21 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\EmployeeResource\Pages;
-use App\Filament\Resources\EmployeeResource\RelationManagers;
-use App\Models\Employee;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
+use App\Models\City;
 use Filament\Tables;
+use App\Models\State;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
+use App\Models\Employee;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\EmployeeResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\EmployeeResource\RelationManagers;
 
 class EmployeeResource extends Resource
 {
@@ -28,30 +33,42 @@ class EmployeeResource extends Resource
                     ->description('Enter the employee\'s personal information.')
                     ->schema([
                         Forms\Components\Select::make('country_id')
-                        ->relationship(name:'country', titleAttribute:'name')
-                        ->searchable()
-                        // ->multiple()
-                        ->preload()
-                        ->required(),
+                            ->relationship(name: 'country', titleAttribute: 'name')
+                            ->searchable()
+                            ->preload()
+                            ->live()
+                            ->afterStateUpdated(function(Set $set){
+                                $set('state_id', null);
+                                $set('city_id', null);
+                            })
+                            ->required(),
                         Forms\Components\Select::make('state_id')
-                    ->relationship(name:'state', titleAttribute:'name')
-                    ->searchable()
-                    // ->multiple()
-                    ->preload()
-                    ->required(),
-                    Forms\Components\Select::make('city_id')
-                    ->relationship(name:'city', titleAttribute:'name')
-                    ->searchable()
-                    // ->multiple()
-                    ->preload()
-                    ->required(),
+                            ->options(fn(Get $get): Collection=>State::query()
+                                ->where('country_id', $get('country_id'))
+                                ->pluck('name', 'id'))
+                            ->searchable()
+                            ->preload()
+                            ->live()
+                            ->afterStateUpdated(function (Set $set) {
+                                $set('city_id', null);
+                            })
+                            ->required(),
+                        Forms\Components\Select::make('city_id')
+                            ->options(fn(Get $get): Collection=>City::query()
+                            ->where('state_id', $get('state_id'))
+                            ->pluck('name', 'id'))
+                            ->searchable()
+                            ->preload()
+                            ->live()
+                            ->required(),
+                        Forms\Components\Select::make('department_id')
+                            ->relationship(name: 'department', titleAttribute: 'name')
+                            ->searchable()
+                            // ->multiple()
+                            ->preload()
+                            ->required(),
                     ])->columns(2),
-                    Forms\Components\Select::make('department_id')
-                    ->relationship(name:'department', titleAttribute:'name')
-                    ->searchable()
-                    // ->multiple()
-                    ->preload()
-                    ->required(),
+
 
                 Forms\Components\Section::make('Personal Information')
                     ->description('Enter the employee\'s personal information.')
