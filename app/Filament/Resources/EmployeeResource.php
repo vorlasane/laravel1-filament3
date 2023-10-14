@@ -37,13 +37,13 @@ class EmployeeResource extends Resource
                             ->searchable()
                             ->preload()
                             ->live()
-                            ->afterStateUpdated(function(Set $set){
+                            ->afterStateUpdated(function (Set $set) {
                                 $set('state_id', null);
                                 $set('city_id', null);
                             })
                             ->required(),
                         Forms\Components\Select::make('state_id')
-                            ->options(fn(Get $get): Collection=>State::query()
+                            ->options(fn (Get $get): Collection => State::query()
                                 ->where('country_id', $get('country_id'))
                                 ->pluck('name', 'id'))
                             ->searchable()
@@ -54,9 +54,9 @@ class EmployeeResource extends Resource
                             })
                             ->required(),
                         Forms\Components\Select::make('city_id')
-                            ->options(fn(Get $get): Collection=>City::query()
-                            ->where('state_id', $get('state_id'))
-                            ->pluck('name', 'id'))
+                            ->options(fn (Get $get): Collection => City::query()
+                                ->where('state_id', $get('state_id'))
+                                ->pluck('name', 'id'))
                             ->searchable()
                             ->preload()
                             ->live()
@@ -90,8 +90,13 @@ class EmployeeResource extends Resource
                 Forms\Components\Section::make('Dates')
                     ->schema([
                         Forms\Components\Datepicker::make('date_of_birth')
+                            ->native(false)
+                            ->displayformat('d/m/Y')
+                            ->maxDate(now()->toDateString())
                             ->required(),
                         Forms\Components\Datepicker::make('date_of_hire')
+                            ->native(false)
+                            ->displayformat('d/m/Y')
                             ->required(),
                     ])->columns(2),
             ]);
