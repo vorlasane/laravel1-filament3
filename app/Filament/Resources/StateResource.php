@@ -28,14 +28,14 @@ class StateResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Select::make('country_id')
-                    ->relationship(name:'country', titleAttribute:'name')
+                    ->relationship(name: 'country', titleAttribute: 'name')
                     ->searchable()
                     // ->multiple()
                     ->preload()
                     ->required(),
                 Forms\Components\TextInput::make('name')
                     ->required()
-                    ->maxLength(255 ),
+                    ->maxLength(255),
             ]);
     }
 
@@ -43,11 +43,16 @@ class StateResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('country_id')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('country.name')
+                    // ->numeric()
+                    ->searchable(isIndividual: true, isGlobal: true)
+                    // ->toggleable(isToggledHiddenByDefault: false)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('name')
-                    ->searchable(),
+                    ->toggleable(isToggledHiddenByDefault: false)
+                    // ->hidden(!auth()->user()->email ==='superadmin@gmail.com')
+                    ->visible(auth()->user()->email ==='superadmin@gmail.com')
+                    ->searchable(isIndividual: true),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -57,6 +62,7 @@ class StateResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('country.name')
             ->filters([
                 //
             ])

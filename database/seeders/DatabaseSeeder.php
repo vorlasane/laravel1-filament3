@@ -21,11 +21,12 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
         // country seeder
-        $this->call(CountriesTableSeeder::class);
+        // $this->call(CountriesTableSeeder::class);
         // state seeder
-        $this->call(StatesTableSeeder::class);
+        // $this->call(StatesTableSeeder::class);
         // city seeder
-        $this->call(CitiesTableSeeder::class);
+        // $this->call(CitiesTableSeeder::class);
+        // department seeder
 
     }
 }
