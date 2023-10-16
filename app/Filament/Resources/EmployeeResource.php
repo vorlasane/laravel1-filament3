@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use Carbon\Carbon;
 use Filament\Forms;
 use App\Models\City;
 use Filament\Tables;
@@ -11,16 +12,19 @@ use Filament\Forms\Set;
 use App\Models\Employee;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Illuminate\Support\Collection;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Enums\FiltersLayout;
+use Filament\Forms\Components\DatePicker;
+use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\TextEntry;
 use App\Filament\Resources\EmployeeResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\EmployeeResource\RelationManagers;
-
-use Filament\Infolists\Infolist;
-use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\TextEntry;
 
 class EmployeeResource extends Resource
 {
@@ -152,8 +156,43 @@ class EmployeeResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
-            ])
+                SelectFilter::make('Department')
+                    ->relationship('department', 'name')
+                    ->searchable()
+                    ->preload()
+                    // ->multiple()
+                    ->label('Department'),
+                Filter::make('Created At')
+                    ->form([
+                        DatePicker::make('created_from'),
+                        DatePicker::make('created_until'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query->when(
+                            $data['created_from'] ?? null,
+                            fn (Builder $query, $date) => $query->whereDate('created_at', '>=', $date)
+                        )->when(
+                            $data['created_until'] ?? null,
+                            fn (Builder $query, $date) => $query->whereDate('created_at', '<=', $date)
+                        );
+                    })
+                    ->indicateUsing(function (array $data):array {
+                        $indicators = [];
+                        if ($data['created_from'] ?? null) {
+                            $indicators['createed_from'] = 'Created from: ' . Carbon::parse($data['created_from'])->format('d/m/Y');
+                        }
+                        if ($data['created_until'] ?? null) {
+                            $indicators['createed_until'] = 'Created until: ' . Carbon::parse($data['created_until'])->format('d/m/Y');
+                        }
+                        return $indicators;
+                    })
+                    // ->columnSpan(2)->columns(2)
+                    ,
+                ]
+                // , layout: FiltersLayout::AboveContent
+                )
+                // ->filtersFormColumns(3)
+
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
@@ -179,18 +218,18 @@ class EmployeeResource extends Resource
                         TextEntry::make('city.name'),
                         TextEntry::make('department.name'),
                     ])->columns(2),
-                    Section::make('User Information')
+                Section::make('User Information')
                     ->schema([
                         TextEntry::make('first_name'),
                         TextEntry::make('last_name'),
                         TextEntry::make('middle_name'),
                     ])->columns(3),
-                    Section::make('Address')
+                Section::make('Address')
                     ->schema([
                         TextEntry::make('address'),
                         TextEntry::make('zip_code'),
                     ])->columns(2),
-                    Section::make('Dates')
+                Section::make('Dates')
                     ->schema([
                         TextEntry::make('date_of_birth'),
                         TextEntry::make('date_of_hire'),
