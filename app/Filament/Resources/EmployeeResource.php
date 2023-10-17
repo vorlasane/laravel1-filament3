@@ -16,16 +16,17 @@ use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Illuminate\Support\Collection;
 use Filament\Tables\Filters\Filter;
+use Illuminate\Database\Eloquent\Model;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Infolists\Components\Section;
+use Illuminate\Notifications\Notification;
 use Filament\Infolists\Components\TextEntry;
 use App\Filament\Resources\EmployeeResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\EmployeeResource\RelationManagers;
-use Illuminate\Database\Eloquent\Model;
 
 class EmployeeResource extends Resource
 {
@@ -75,7 +76,7 @@ class EmployeeResource extends Resource
     }
 
 
-    
+
     public static function form(Form $form): Form
     {
         return $form
@@ -243,6 +244,8 @@ class EmployeeResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+                
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
