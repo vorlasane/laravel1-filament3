@@ -25,6 +25,7 @@ use Filament\Infolists\Components\TextEntry;
 use App\Filament\Resources\EmployeeResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\EmployeeResource\RelationManagers;
+use Illuminate\Database\Eloquent\Model;
 
 class EmployeeResource extends Resource
 {
@@ -32,7 +33,49 @@ class EmployeeResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
     protected static ?string $navigationGroup = 'Employee Management';
+    // global search 
+    protected static ?string $recordTitleAttribute = 'first_name';
+    public static function getGlobalSearchResultTitle(Model $record): string
+    {
+        return $record->first_name . ' ' . $record->last_name;
+    }
+    public static function getGloballySearchableAttributes(): array
+    {
+        return [
+            'first_name',
+            'last_name',
+            'middle_name',
+            'address',
+            'zip_code',
+        ];
+    }
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        return [
+            'Department' => $record->department->name,
+            'Country' => $record->country->name,
+            'State' => $record->state->name,
+            'City' => $record->city->name,
+        ];
+    }
+    public static function getGlobalSearchEloquentQuery(): Builder
+    {
+        return parent::getGlobalSearchEloquentQuery()->with(['department', 'country', 'state', 'city']);
+    }
 
+    //getNavigation badge
+    public static function getNavigationBadge(): string
+    {
+        return static::getModel()::withoutGlobalScope(SoftDeletingScope::class)->count();
+    }
+    // getNavigationBadgeColor   
+    public static function getNavigationBadgeColor(): string|array|null
+    {
+        return static::getModel()::count() > 5 ? 'warning' : 'success';
+    }
+
+
+    
     public static function form(Form $form): Form
     {
         return $form
@@ -137,15 +180,19 @@ class EmployeeResource extends Resource
                 Tables\Columns\TextColumn::make('middle_name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('address')
+                    // limit charactor 
+                    ->limit(50)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('zip_code')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('date_of_birth')
                     ->date()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('date_of_hire')
                     ->date()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

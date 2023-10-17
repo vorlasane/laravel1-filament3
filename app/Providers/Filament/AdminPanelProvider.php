@@ -35,6 +35,7 @@ class AdminPanelProvider extends PanelProvider
                 'success' => Color::Emerald,
                 'warning' => Color::Orange,
             ])
+            ->navigationGroups(['Employee Management', 'System Management','User Management'])
             ->font('Inter')
             ->brandName('Filament Demo')
             ->favicon(asset('images/favicon.ico'))

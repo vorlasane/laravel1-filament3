@@ -31,6 +31,17 @@ class CountryResource extends Resource
     protected static ?int $navigationSort = 1;
     protected static ?string $slug = 'employee-countries';
 
+     //getNavigation badge
+     public static function getNavigationBadge(): string
+     {
+         return static::getModel()::withoutGlobalScope(SoftDeletingScope::class)->count();
+     }
+     // getNavigationBadgeColor   
+     public static function getNavigationBadgeColor(): string|array|null
+     {
+         return static::getModel()::count() > 5 ? 'warning' : 'success';
+     }
+
     public static function form(Form $form): Form
     {
         return $form

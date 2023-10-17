@@ -18,6 +18,18 @@ class UserResource extends Resource
     protected static ?string $model = User::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
+    protected static ?string $navigationGroup = 'User Management';
+
+     //getNavigation badge
+     public static function getNavigationBadge(): string
+     {
+         return static::getModel()::withoutGlobalScope(SoftDeletingScope::class)->count();
+     }
+     // getNavigationBadgeColor   
+     public static function getNavigationBadgeColor(): string|array|null
+     {
+         return static::getModel()::count() > 5 ? 'warning' : 'success';
+     }
 
     public static function form(Form $form): Form
     {
