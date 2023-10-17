@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use Filament\Forms;
 use Filament\Tables;
 use App\Models\State;
+use App\Models\Employee;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Infolists\Infolist;
@@ -15,6 +16,8 @@ use Filament\Infolists\Components\TextEntry;
 use App\Filament\Resources\StateResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\StateResource\RelationManagers;
+use App\Filament\Resources\StateResource\RelationManagers\CitiesRelationManager;
+use App\Filament\Resources\StateResource\RelationManagers\EmployeesRelationManager;
 
 class StateResource extends Resource
 {
@@ -38,6 +41,7 @@ class StateResource extends Resource
                     ->required(),
                 Forms\Components\TextInput::make('name')
                     ->required()
+                    ->label('State Name')
                     ->maxLength(255),
             ]);
     }
@@ -100,7 +104,8 @@ class StateResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            CitiesRelationManager::class,
+            EmployeesRelationManager::class,
         ];
     }
 

@@ -5,17 +5,19 @@ namespace App\Filament\Resources;
 use Filament\Forms;
 use App\Models\City;
 use Filament\Tables;
+use App\Models\Employee;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\TextEntry;
 
+use Filament\Infolists\Components\TextEntry;
 use App\Filament\Resources\CityResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\CityResource\RelationManagers;
+use App\Filament\Resources\CityResource\RelationManagers\EmployeesRelationManager;
 
 class CityResource extends Resource
 {
@@ -93,7 +95,7 @@ class CityResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            EmployeesRelationManager::class,
         ];
     }
 
